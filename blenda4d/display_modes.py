@@ -32,6 +32,7 @@ TIPS = {"A": "smooth shading under the viewport light",
         "S": "show or hide the sidebar"}
 
 _colors = {}                                             # a view's own colour setting, kept while it shows Hidden Line
+_lines = set()                                           # views whose lines are put away (keep_lines)
 
 
 def _space(context):
@@ -86,6 +87,19 @@ def _keep_color(sp, keep):
         sh.single_color = (0.8, 0.8, 0.8)
     elif not keep and ptr in _colors:
         sh.color_type, sh.single_color = _colors.pop(ptr)
+
+
+def keep_lines(sp, mode):
+    """The lines of a "(Lines)" display belong to that display: they are put away while the view shows Material
+    Preview or Rendered, and are back when it shows a solid display again."""
+    ov, ptr = sp.overlay, sp.as_pointer()
+    if mode in ("MATERIAL", "RENDERED"):
+        if ov.show_wireframes:
+            _lines.add(ptr)
+            ov.show_wireframes = False
+    elif ptr in _lines:
+        _lines.discard(ptr)
+        ov.show_wireframes = mode == "SOLID"
 
 
 def _set_type(sp, mode):
