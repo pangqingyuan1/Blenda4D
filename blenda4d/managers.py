@@ -1158,7 +1158,10 @@ class BLENDA4D_PT_objects(roles.RolePanel, bpy.types.Panel):
 
 def _big_view(context):
     views = [a for a in context.screen.areas if a.type == "VIEW_3D" and len(a.spaces)]
-    return max(views, key=lambda a: a.width * a.height) if views else None
+    if len(views) > 1:                                     # four views: the Perspective one, the view a render shows
+        from . import build
+        return build._persp(context.screen)
+    return views[0] if views else None
 
 
 def _region_3d(area):
